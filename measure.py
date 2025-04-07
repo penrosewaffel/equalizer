@@ -208,4 +208,26 @@ if True:    #  space for loops etc.
     ILFSe=analysis(FAe,FBe,14)
     ILFS=analysis(FA,FB,14) 
 
+    Se=irfft( np.exp( hilbert( -ILFSe, axis=0) ), axis=0 )
+    So=irfft( np.exp( hilbert( -ILFSo, axis=0) ), axis=0 )
+
+    S = Se + So
+
+    T = np.roll( np.flip( S, axis=0 ), 32, axis=0 )
+
+    clf()
     
+    plot( T )
+
+    # Apply a window of 1024
+    # We're ignoring any accidential imaginary part
+
+    X = copy( np.real(T).astype('float') ) [:1024, :]
+
+    # convert to signed int
+    
+    Q = np.array( X / np.max(abs(X)) * 32760, 'int16') 
+
+    # write a file
+    
+    write( "equalizer.wav", 48000, Q )
